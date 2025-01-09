@@ -3,7 +3,7 @@
 #
 # some rando on the internet: Liv Rickey <rickeyollie@gmail.com>
 pkgname=cosmic-edit-git
-pkgver=1.0.0.alpha.3.r0.g3d92409
+pkgver=0.1.0
 pkgrel=1
 pkgdesc="Text editor for the COSMIC desktop"
 arch=('x86_64')

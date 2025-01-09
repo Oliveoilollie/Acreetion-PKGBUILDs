@@ -1,0 +1,9 @@
+these packages have meson bugs/need tar balls
+
+cracklib
+audit
+bison
+bzip2
+mkinitcpio
+
+will work on base packages soon! hold tight

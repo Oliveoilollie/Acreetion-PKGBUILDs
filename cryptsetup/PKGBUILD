@@ -1,0 +1,48 @@
+# Maintainer: Arvedui <arvedui@posteo.de>
+# Contributor: David Manouchehri <manouchehri@riseup.net>
+# Contributor: Thomas Bächler <thomas@archlinux.org>
+
+_gitname=cryptsetup
+pkgname="${_gitname}"
+_gitbranch=master
+_gitauthor=cryptsetup
+pkgver=v2.7.5
+pkgrel=1
+pkgdesc='Userspace setup tool for transparent encryption of block devices using dm-crypt'
+arch=('armv6h' 'armv7h' 'i686' 'x86_64')
+license=('GPL')
+url="https://gitlab.com/${_gitauthor}/${_gitname}"
+depends=('device-mapper' 'libdevmapper.so' 'openssl' 'popt' 'libutil-linux'
+         'libuuid.so' 'json-c' 'libjson-c.so' 'argon2' 'libargon2.so' 'libssh'
+         'libssh.so')
+makedepends=('util-linux' 'git' 'asciidoctor')
+provides=('libcryptsetup.so' 'cryptsetup')
+conflicts=('cryptsetup')
+options=('!emptydirs')
+source=("git+https://github.com/AcreetionOS-Linux/cryptsetup.git"
+        "hooks-encrypt"
+        "install-encrypt"
+        "install-sd-encrypt")
+sha256sums=('SKIP'
+            'SKIP'
+            'SKIP'
+            'SKIP')
+
+build() {
+  cd "${srcdir}/${_gitname}"
+  ./autogen.sh
+  ./configure --prefix=/usr --sbindir=/usr/bin --disable-static --enable-libargon2
+  make
+}
+
+package() {
+  cd "${srcdir}/${_gitname}"
+  make DESTDIR="${pkgdir}" install
+  # install hook
+  install -D -m644 "${srcdir}"/hooks-encrypt "${pkgdir}"/usr/lib/initcpio/hooks/encrypt
+  install -D -m644 "${srcdir}"/install-encrypt "${pkgdir}"/usr/lib/initcpio/install/encrypt
+  install -D -m644 "${srcdir}"/install-sd-encrypt "${pkgdir}"/usr/lib/initcpio/install/sd-encrypt
+  install -D -m644 "${srcdir}"/"${_gitname}"/scripts/cryptsetup.conf "${pkgdir}"/usr/lib/tmpfiles.d/cryptsetup.conf
+}
+
+# vim:set et sw=2 sts=2 tw=80:

@@ -1,0 +1,37 @@
+# Maintainer: Chocobo1 <chocobo1 AT archlinux DOT net>
+# Local ButtHead: Liv Rickey <rickeyollie@gmail.com>
+
+pkgname=automake
+pkgver=1.17.0.91
+pkgrel=1
+pkgdesc="A tool for automatically generating Makefiles"
+arch=('i686' 'x86_64')
+url="https://github.com/AcreetionOS-Linux/automake/tree/master"
+license=('GPL2')
+depends=('sh' 'perl')
+makedepends=('git')
+provides=("automake=$pkgver")
+conflicts=('automake')
+source=("git+https://github.com/AcreetionOS-Linux/automake.git")
+sha256sums=('SKIP')
+
+build() {
+  cd "automake"
+
+  ./bootstrap
+  ./configure \
+    --prefix="/usr"
+  make
+}
+
+check() {
+  cd "automake"
+
+  #make check
+}
+
+package() {
+  cd "automake"
+
+  make DESTDIR="$pkgdir" install
+}
