@@ -1,0 +1,49 @@
+# Maintainer: Chocobo1 <chocobo1 AT archlinux DOT net>
+# AcreetionOS Maintainer: Liv Rickey <rickeyollie@gmail.com>
+
+pkgname=gettext
+pkgver=0.21.r12.ge645b7d56
+pkgrel=1
+pkgdesc="GNU internationalization library"
+arch=('i686' 'x86_64')
+url="https://github.com/AcreetionOS-Linux/gettext"
+license=('GPL3')
+depends=('glibc' 'glib2' 'gperf' 'libunistring' 'ncurses')
+makedepends=('git' 'fpc' 'grep' 'help2man' 'wget' 'xz')
+provides=("gettext=$pkgver")
+conflicts=('gettext')
+source=("git+https://github.com/AcreetionOS-Linux/gettext.git"
+  .gitmodules)
+sha256sums=('SKIP' 'SKIP')
+
+
+prepare() {
+  cd "gettext"
+
+  # gnu repos so fucking slow, we use ours
+  git checkout ACREETIONOS
+
+  git submodule update --init --recursive
+}
+
+build() {
+  cd "gettext"
+
+  ./autogen.sh
+  ./configure \
+    --prefix="/usr" \
+    --without-gettext-tools
+  make maintainer-update-po-local
+}
+
+check() {
+  cd "gettext"
+
+  make check
+}
+
+package() {
+  cd "gettext"
+
+  make DESTDIR="$pkgdir" install
+}
