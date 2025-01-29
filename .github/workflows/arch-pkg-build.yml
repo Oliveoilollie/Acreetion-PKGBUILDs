@@ -1,0 +1,42 @@
+name: Build Arch Packages
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to 'main' branch, change as needed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Or a self-hosted Arch runner
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Arch Linux container
+        uses: devcontainers/cli@v0
+        with:
+          devcontainer-path: .devcontainer/Dockerfile
+
+      - name: Install dependencies
+        run: |
+          sudo pacman -Syu --noconfirm base-devel git yay
+
+      - name: Build all packages
+        run: |
+          # Loop over each folder containing PKGBUILD and build it
+          for dir in */; do
+            if [ -f "$dir/PKGBUILD" ]; then
+              echo "Building package in $dir"
+              cd $dir
+              makepkg -si --noconfirm --syncdeps --cleanbuild
+              cd ..
+            fi
+          done
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v3
+        with:
+          name: arch-packages
+          path: '*.pkg.tar.zst'  # Adjust if necessary to match the built packages
+
