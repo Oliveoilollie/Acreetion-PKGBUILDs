@@ -3,36 +3,30 @@ name: Build Arch Packages
 on:
   push:
     branches:
-      - main  # Trigger on push to 'main' branch, change as needed
+      - main  # Trigger on push to the 'main' branch, change as needed
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Or a self-hosted Arch runner
+    runs-on: ubuntu-latest  # This uses the Ubuntu runner to start, but Arch will run inside Docker
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Arch Linux container
-        uses: devcontainers/cli@v3
-        with:
-          devcontainer-path: .devcontainer/Dockerfile
-
-      - name: Install dependencies
+      - name: Set up Arch Linux Docker container
         run: |
-          sudo pacman -Syu --noconfirm base-devel git yay
-
-      - name: Build all packages
-        run: |
-          # Loop over each folder containing PKGBUILD and build it
-          for dir in */; do
-            if [ -f "$dir/PKGBUILD" ]; then
-              echo "Building package in $dir"
-              cd $dir
-              makepkg -si --noconfirm --syncdeps --cleanbuild
-              cd ..
-            fi
-          done
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace archlinux:latest bash -c "
+            pacman -Syu --noconfirm base-devel git yay &&
+            # Loop through directories and build each PKGBUILD
+            for dir in */; do
+              if [ -f \"$dir/PKGBUILD\" ]; then
+                echo \"Building package in $dir\"
+                cd $dir
+                makepkg -si --noconfirm --syncdeps --cleanbuild
+                cd ..
+              fi
+            done
+          "
 
       - name: Upload built packages
         uses: actions/upload-artifact@v3
