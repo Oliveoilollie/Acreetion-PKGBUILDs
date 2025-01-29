@@ -16,7 +16,7 @@ jobs:
       - name: Set up Arch Linux Docker container
         run: |
           docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace archlinux:latest bash -c "
-            pacman -Syu --noconfirm base-devel git yay &&
+            pacman -Syu --noconfirm base-devel git &&
             # Loop through directories and build each PKGBUILD
             for dir in */; do
               if [ -f \"$dir/PKGBUILD\" ]; then
